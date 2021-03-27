@@ -5,7 +5,6 @@ basedir="Demo"
 for i in 1 2 3 4 5 6 7 8
 do
 	dir=$basedir$i
-	echo $dir
 	cd $dir
 	if [ ! -d "build" ]; then
 		mkdir build
@@ -18,7 +17,9 @@ do
 	fi
 
 	echo "************" + ${dir} + "result**********"
-	./demo
+	if [ -f "demo" ]; then
+    	./demo
+	fi
 	cd ../../
 
 done
