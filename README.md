@@ -25,7 +25,6 @@ int main()
 	printf("my sum is :%d\n\n", sum);	
 	return 0;
 }
-
 ```
 
 编写CMakeLists.txt文件，保存在与main.c同一目录下。
@@ -39,7 +38,6 @@ project (Demo1)
 
 # 指定生成目标
 add_executable(demo main.c)
-
 ```
 
 CMakeLists.txt的语法比较简单，由命令、注释和空格组成。注意
@@ -522,7 +520,6 @@ drwxr-xr-x 3 root root 4096 3月  27 11:21 CMakeFiles/
 -rw-r--r-- 1 root root 1138 3月  27 11:21 cmake_install.cmake
 -rw-r--r-- 1 root root 1700 3月  27 11:21 libmysubfun.a
 -rw-r--r-- 1 root root 5578 3月  27 11:21 Makefile
-
 ```
 
 
@@ -587,7 +584,6 @@ Install the project...
 -- Installing: /usr/local/include/add.h
 -- Installing: /usr/local/lib/libmysubfun.a
 -- Installing: /usr/local/include/sub.h
-
 ```
 
 安装好后，执行`demo`：
@@ -601,7 +597,6 @@ it is my add function!
 my sum is :3
 
 my sub is :7
-
 ```
 
 
@@ -780,7 +775,6 @@ include (CPack)
   my sum is :3
   
   my sub is :7
-  
   ```
 
   
