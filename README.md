@@ -104,11 +104,11 @@ my sum is :3
 
 目录结构是
 
-> .
-> ├── add.c
-> ├── add.h
-> ├── CMakeLists.txt
-> └── main.c
+.
+├── add.c
+├── add.h
+├── CMakeLists.txt
+└── main.c
 
  这时，对应的CMakeLists.txt是：
 
