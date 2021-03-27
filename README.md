@@ -102,6 +102,48 @@ my sum is :3
 
 > 对应源代码目录： [Demo2](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo2)
 
+目录结构是
+
+> .
+> ├── add.c
+> ├── add.h
+> ├── CMakeLists.txt
+> └── main.c
+
+ 这时，对应的CMakeLists.txt是：
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo2)
+
+# first 第一种添加源文件的方式
+add_executable(demo add.h add.c main.c)
+```
+
+但是要是源文件比较多的时候，一个个添加太麻烦，更好的方法是使用 **aux_source_directory**,该命令会查找指定目录下的所有源文件，然后将结果存进指定变量名，可以多次添加，因些修改的CMakeLists.txt是：
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo2)
+
+# first 第一种添加源文件的方式
+#add_executable(demo add.h add.c main.c)
+
+# second 第二种添加源文件的方式，推荐这种
+aux_source_directory(. DIR_SRCS)
+
+# 指定生成目标
+add_executable(demo ${DIR_SRCS})
+```
+
+后面的编译与上述一致。
+
 ### Demo3 多个目录和文件
 
 > 对应源代码目录： [Demo3](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo3)
