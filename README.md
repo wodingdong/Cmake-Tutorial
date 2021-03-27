@@ -55,7 +55,7 @@ CMakeLists.txt的语法比较简单，由命令、注释和空格组成。注意
 
 编译项目，建议在当前目录新建一个目录，将编译后的文件放在该目录，不与源文件混在一起。编译后得到demo的可执行文件。
 
-```
+```sh
 root@dong:/home/dong/Cmake-Tutorial/Demo1# mkdir build
 root@dong:/home/dong/Cmake-Tutorial/Demo1# cd build/
 root@dong:/home/dong/Cmake-Tutorial/Demo1/build# cmake ..
@@ -192,29 +192,546 @@ add_executable(demo ${DIR_SRCS})
 
 > 对应源代码目录： [Demo4](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo4)
 
+若只想将add函数封装成一个库，一个静态库，那么CMakeLists.txt是下面，**add_library参数是默认是STATIC**
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo4)
+
+# 添加源文件
+aux_source_directory(. DIR_LIB_SRCS)
+
+# 生成静态库文件
+add_library(myaddfun STATIC ${DIR_LIB_SRCS})
+
+```
+
+编译生成libaddfun.a文件
+
+```sh
+root@dong:/home/dong/Cmake-Tutorial/Demo4# mkdir build
+root@dong:/home/dong/Cmake-Tutorial/Demo4# cd build/
+root@dong:/home/dong/Cmake-Tutorial/Demo4/build# cmake ..
+-- The C compiler identification is GNU 7.5.0
+-- The CXX compiler identification is GNU 7.5.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/dong/Cmake-Tutorial/Demo4/build
+root@dong:/home/dong/Cmake-Tutorial/Demo4/build# make
+Scanning dependencies of target myaddfun
+[ 50%] Building C object CMakeFiles/myaddfun.dir/add.c.o
+[100%] Linking C static library libmyaddfun.a
+[100%] Built target myaddfun
+root@dong:/home/dong/Cmake-Tutorial/Demo4/build# ll
+总用量 44
+drwxr-xr-x 3 root root  4096 3月  27 10:56 ./
+drwxr-xr-x 3 root root  4096 3月  27 10:55 ../
+-rw-r--r-- 1 root root 12730 3月  27 10:56 CMakeCache.txt
+drwxr-xr-x 5 root root  4096 3月  27 10:56 CMakeFiles/
+-rw-r--r-- 1 root root  1540 3月  27 10:56 cmake_install.cmake
+-rw-r--r-- 1 root root  1700 3月  27 10:56 libmyaddfun.a
+-rw-r--r-- 1 root root  4817 3月  27 10:56 Makefile
+```
+
 ### Demo5 动态库
 
 > 对应源代码目录： [Demo5](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo5)
+
+与上述Demo4一致，需要将STATIC改成**SHARED**,CMakeLists.txt是：
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo4)
+
+# 添加源文件
+aux_source_directory(. DIR_LIB_SRCS)
+
+# 生成动态库文件
+add_library(myaddfun SHARED ${DIR_LIB_SRCS})
+```
+
+编译：
+
+```sh
+root@dong:/home/dong/testgit/cmtu/Cmake-Tutorial/Demo5/build# make
+Scanning dependencies of target myaddfun
+[ 50%] Building C object CMakeFiles/myaddfun.dir/add.c.o
+[100%] Linking C shared library libmyaddfun.so
+[100%] Built target myaddfun
+root@dong:/home/dong/testgit/cmtu/Cmake-Tutorial/Demo5/build# ll
+总用量 48
+drwxr-xr-x 3 root root  4096 3月  27 11:05 ./
+drwxr-xr-x 3 root root  4096 3月  27 11:04 ../
+-rw-r--r-- 1 root root 12730 3月  27 11:04 CMakeCache.txt
+drwxr-xr-x 5 root root  4096 3月  27 11:05 CMakeFiles/
+-rw-r--r-- 1 root root  1540 3月  27 11:04 cmake_install.cmake
+-rwxr-xr-x 1 root root  7896 3月  27 11:05 libmyaddfun.so*
+-rw-r--r-- 1 root root  4817 3月  27 11:04 Makefile
+```
 
 ### Demo6 使用静态库
 
 > 对应源代码目录： [Demo6](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo6)
 
+使用外部静态库，这里使用Demo4中生成的静态库，
+
+- 需要使用**include_directories** 添加头文件
+- 使用**link_directories**查找链接的目录
+- 使用**target_link_libraries**链接库文件， 这里去查找libmyaddfun.a文件
+
+CMakeList是：
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo6)
+
+# 添加源文件
+aux_source_directory(. DIR_SRCS)
+
+# 包含头文件路径
+include_directories(../Demo4/)
+
+# 链接库的目录路径
+link_directories(../Demo4/build)
+
+# 指定生成目标
+add_executable(demo ${DIR_SRCS})
+
+# 需要链接库的名称
+target_link_libraries(demo myaddfun)
+
+```
+
+编译：
+
+```sh
+root@dong:/home/dong/Cmake-Tutorial/Demo6/build# make
+Scanning dependencies of target demo
+[ 50%] Building C object CMakeFiles/demo.dir/main.c.o
+/home/dong/Cmake-Tutorial/Demo6/main.c: In function ‘main’:
+/home/dong/Cmake-Tutorial/Demo6/main.c:6:2: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+  printf("my sum is :%d\n\n", sum);
+  ^~~~~~
+/home/dong/Cmake-Tutorial/Demo6/main.c:6:2: warning: incompatible implicit declaration of built-in function ‘printf’
+/home/dong/Cmake-Tutorial/Demo6/main.c:6:2: note: include ‘<stdio.h>’ or provide a declaration of ‘printf’
+[100%] Linking C executable demo
+[100%] Built target demo
+root@dong:/home/dong/Cmake-Tutorial/Demo6/build# ll
+总用量 52
+drwxr-xr-x 3 root root  4096 3月  27 11:10 ./
+drwxr-xr-x 3 root root  4096 3月  27 11:10 ../
+-rw-r--r-- 1 root root 12674 3月  27 11:10 CMakeCache.txt
+drwxr-xr-x 5 root root  4096 3月  27 11:10 CMakeFiles/
+-rw-r--r-- 1 root root  1540 3月  27 11:10 cmake_install.cmake
+-rwxr-xr-x 1 root root  8400 3月  27 11:10 demo*
+-rw-r--r-- 1 root root  4778 3月  27 11:10 Makefile
+
+```
+
 ### Demo7 使用动态库
 
 > 对应源代码目录： [Demo7](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo7)
+
+与使用静态库一致，这里使用Demo5生成的动态库，CMakeLists.txt是：
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo7)
+
+# 添加源文件
+aux_source_directory(. DIR_SRCS)
+
+# 包含头文件路径
+include_directories(../Demo5/)
+
+# 链接库的目录路径
+link_directories(../Demo5/build)
+
+# 指定生成目标
+add_executable(demo ${DIR_SRCS})
+
+# 需要链接库的名称
+target_link_libraries(demo myaddfun)
+```
 
 ### Demo8 生成库并同时使用
 
 > 对应源代码目录： [Demo8](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo8)
 
+项目结构是：
+
+.
+├── add
+
+│   ├── add.c
+
+│   ├── add.h
+
+│   └── CMakeLists.txt
+
+├── CMakeLists.txt
+
+├── main.c
+
+└── sub
+
+​    ├── CMakeLists.txt
+
+​    ├── sub.c
+
+​    └── sub.h
+
+可以在程序中生成静态库或动态库并使用，CMakeLists.txt
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo8)
+
+# 包含头文件路径
+include_directories(add)
+include_directories(sub)
+
+# 添加源文件
+aux_source_directory(. DIR_SRCS)
+
+# 添加add sub 子目录
+add_subdirectory(add)
+add_subdirectory(sub)
+
+# 指定生成目标
+add_executable(demo ${DIR_SRCS})
+
+# 需要链接库的名称
+target_link_libraries(demo myaddfun mysubfun)
+```
+
+在add和sub目录中需要写一个CMakeLists.txt生成库文件：
+
+```cmake
+aux_source_directory(. DIR_LIB_SRCS)
+
+add_library(myaddfun STATIC ${DIR_LIB_SRCS})
+```
+
+编译：
+
+```sh
+root@dong:/home/dong/Cmake-Tutorial/Demo8# mkdir build
+root@dong:/home/dong/Cmake-Tutorial/Demo8# cd build/
+root@dong:/home/dong/Cmake-Tutorial/Demo8/build# cmake ..
+-- The C compiler identification is GNU 7.5.0
+-- The CXX compiler identification is GNU 7.5.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/dong/Cmake-Tutorial/Demo8/build
+root@dong:/home/dong/Cmake-Tutorial/Demo8/build# make
+Scanning dependencies of target myaddfun
+[ 16%] Building C object add/CMakeFiles/myaddfun.dir/add.c.o
+[ 33%] Linking C static library libmyaddfun.a
+[ 33%] Built target myaddfun
+Scanning dependencies of target mysubfun
+[ 50%] Building C object sub/CMakeFiles/mysubfun.dir/sub.c.o
+/home/dong/Cmake-Tutorial/Demo8/sub/sub.c: In function ‘sub’:
+/home/dong/Cmake-Tutorial/Demo8/sub/sub.c:5:2: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+  printf("\n it is my sub function!\n");
+  ^~~~~~
+/home/dong/Cmake-Tutorial/Demo8/sub/sub.c:5:2: warning: incompatible implicit declaration of built-in function ‘printf’
+/home/dong/Cmake-Tutorial/Demo8/sub/sub.c:5:2: note: include ‘<stdio.h>’ or provide a declaration of ‘printf’
+[ 66%] Linking C static library libmysubfun.a
+[ 66%] Built target mysubfun
+Scanning dependencies of target demo
+[ 83%] Building C object CMakeFiles/demo.dir/main.c.o
+/home/dong/Cmake-Tutorial/Demo8/main.c: In function ‘main’:
+/home/dong/Cmake-Tutorial/Demo8/main.c:8:2: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+  printf("my sum is :%d\n\n", sum);
+  ^~~~~~
+/home/dong/Cmake-Tutorial/Demo8/main.c:8:2: warning: incompatible implicit declaration of built-in function ‘printf’
+/home/dong/Cmake-Tutorial/Demo8/main.c:8:2: note: include ‘<stdio.h>’ or provide a declaration of ‘printf’
+[100%] Linking C executable demo
+[100%] Built target demo
+root@dong:/home/dong/Cmake-Tutorial/Demo8/build# ll
+总用量 60
+drwxr-xr-x 5 root root  4096 3月  27 11:21 ./
+drwxr-xr-x 5 root root  4096 3月  27 11:20 ../
+drwxr-xr-x 3 root root  4096 3月  27 11:21 add/
+-rw-r--r-- 1 root root 12786 3月  27 11:21 CMakeCache.txt
+drwxr-xr-x 5 root root  4096 3月  27 11:21 CMakeFiles/
+-rw-r--r-- 1 root root  1813 3月  27 11:21 cmake_install.cmake
+-rwxr-xr-x 1 root root  8456 3月  27 11:21 demo*
+-rw-r--r-- 1 root root  5616 3月  27 11:21 Makefile
+drwxr-xr-x 3 root root  4096 3月  27 11:21 sub/
+```
+
+在这个目录下的add和sub下生成静态库文件：
+
+```sh
+root@dong:/home/dong/testgit/cmtu/Cmake-Tutorial/Demo8/build# ll add/ sub/
+add/:
+总用量 28
+drwxr-xr-x 3 root root 4096 3月  27 11:21 ./
+drwxr-xr-x 5 root root 4096 3月  27 11:21 ../
+drwxr-xr-x 3 root root 4096 3月  27 11:21 CMakeFiles/
+-rw-r--r-- 1 root root 1138 3月  27 11:21 cmake_install.cmake
+-rw-r--r-- 1 root root 1700 3月  27 11:21 libmyaddfun.a
+-rw-r--r-- 1 root root 5578 3月  27 11:21 Makefile
+
+sub/:
+总用量 28
+drwxr-xr-x 3 root root 4096 3月  27 11:21 ./
+drwxr-xr-x 5 root root 4096 3月  27 11:21 ../
+drwxr-xr-x 3 root root 4096 3月  27 11:21 CMakeFiles/
+-rw-r--r-- 1 root root 1138 3月  27 11:21 cmake_install.cmake
+-rw-r--r-- 1 root root 1700 3月  27 11:21 libmysubfun.a
+-rw-r--r-- 1 root root 5578 3月  27 11:21 Makefile
+
+```
+
+
+
 ### Demo_install 程序安装
 
 > 对应源代码目录： [Demo_install](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo_install)
 
+CMake 也可以指定安装规则，以及添加测试。这两个功能分别可以通过在产生 Makefile 后使用 `make install` 来执行
+
+在add/CMakeLists.txt和sub/CMakeLists.txt添加下面：
+
+```cmake
+# 指定 add 库的安装路径
+install (TARGETS myaddfun DESTINATION lib)
+install (FILES add.h DESTINATION include)
+```
+
+指明myaddfun和mysubfun库的安装路径 。之后修改根目录下的CMakeLists.txt，添加下面的：
+
+```cmake
+# 指定安装路径
+install (TARGETS demo DESTINATION bin)
+```
+
+通过上述的修改，生成的demo文件和add,sub函数库文件libmyaddfun.o，libmysubfun.o被复制到**/usr/local/bin**下，对应的add.h和sub.h会复制到/usr/local/include下（这里的 `/usr/local/` 是默认安装到的根目录，可以通过修改 `CMAKE_INSTALL_PREFIX` 变量的值来指定这些文件应该拷贝到哪个根目录）
+
+```sh
+root@dong:/home/dong/Cmake-Tutorial/Demo_install/build# make
+Scanning dependencies of target mysubfun
+[ 16%] Building C object sub/CMakeFiles/mysubfun.dir/sub.c.o
+/home/dong/Cmake-Tutorial/Demo_install/sub/sub.c: In function ‘sub’:
+/home/dong/Cmake-Tutorial/Demo_install/sub/sub.c:5:2: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+  printf("\n it is my sub function!\n");
+  ^~~~~~
+/home/dong/Cmake-Tutorial/Demo_install/sub/sub.c:5:2: warning: incompatible implicit declaration of built-in function ‘printf’
+/home/dong/Cmake-Tutorial/Demo_install/sub/sub.c:5:2: note: include ‘<stdio.h>’ or provide a declaration of ‘printf’
+[ 33%] Linking C static library libmysubfun.a
+[ 33%] Built target mysubfun
+Scanning dependencies of target myaddfun
+[ 50%] Building C object add/CMakeFiles/myaddfun.dir/add.c.o
+[ 66%] Linking C static library libmyaddfun.a
+[ 66%] Built target myaddfun
+Scanning dependencies of target demo
+[ 83%] Building C object CMakeFiles/demo.dir/main.c.o
+/home/dong/Cmake-Tutorial/Demo_install/main.c: In function ‘main’:
+/home/dong/Cmake-Tutorial/Demo_install/main.c:8:2: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+  printf("my sum is :%d\n\n", sum);
+  ^~~~~~
+/home/dong/Cmake-Tutorial/Demo_install/main.c:8:2: warning: incompatible implicit declaration of built-in function ‘printf’
+/home/dong/Cmake-Tutorial/Demo_install/main.c:8:2: note: include ‘<stdio.h>’ or provide a declaration of ‘printf’
+[100%] Linking C executable demo
+[100%] Built target demo
+root@dong:/home/dong/Cmake-Tutorial/Demo_install/build# make install
+[ 33%] Built target mysubfun
+[ 66%] Built target myaddfun
+[100%] Built target demo
+Install the project...
+-- Install configuration: ""
+-- Installing: /usr/local/bin/demo
+-- Installing: /usr/local/lib/libmyaddfun.a
+-- Installing: /usr/local/include/add.h
+-- Installing: /usr/local/lib/libmysubfun.a
+-- Installing: /usr/local/include/sub.h
+
+```
+
+安装好后，执行`demo`：
+
+```sh
+root@dong:/home/dong/Cmake-Tutorial/Demo_install# demo 
+
+it is my add function!
+
+ it is my sub function!
+my sum is :3
+
+my sub is :7
+
+```
+
+
+
 ### Demode_pack 程序打包
 
 > 对应源代码目录： [Demo_pack](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo_pack)
+
+配置生成各种平台上的安装包，包括二进制安装包和源码安装包。为了完成这个任务，我们需要用到 CPack ，它同样也是由 CMake 提供的一个工具，专门用于打包.
+
+首先在根目录的CMakeLists.txt添加下述：
+
+```cmake
+# 构建一个 CPack 安装包
+include (InstallRequiredSystemLibraries)
+set (CPACK_RESOURCE_FILE_LICENSE
+  "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+
+include (CPack)
+```
+
+后面是上述demo一样编译构建，执行`cpack`命令
+
+- 生成二进制安装包：
+
+  ```
+  cpack -C CPackConfig.cmake
+  ```
+
+- 生成源码安装包
+
+  ```
+  cpack -C CPackSourceConfig.cmake
+  ```
+
+  执行一下：
+
+  ```sh
+  root@dong:/home/dong/Cmake-Tutorial/Demo_pack/build# cpack -C CPackConfig.cmake 
+  CPack: Create package using STGZ
+  CPack: Install projects
+  CPack: - Run preinstall target for: DemoPack
+  CPack: - Install project: DemoPack
+  CPack: Create package
+  CPack: - package: /home/dong/Cmake-Tutorial/Demo_pack/build/DemoPack-0.1.1-Linux.sh generated.
+  CPack: Create package using TGZ
+  CPack: Install projects
+  CPack: - Run preinstall target for: DemoPack
+  CPack: - Install project: DemoPack
+  CPack: Create package
+  CPack: - package: /home/dong/Cmake-Tutorial/Demo_pack/build/DemoPack-0.1.1-Linux.tar.gz generated.
+  CPack: Create package using TZ
+  CPack: Install projects
+  CPack: - Run preinstall target for: DemoPack
+  CPack: - Install project: DemoPack
+  CPack: Create package
+  CPack: - package: /home/dong/Cmake-Tutorial/Demo_pack/build/DemoPack-0.1.1-Linux.tar.Z generated.
+  
+  ```
+
+  这里在该目录下生成3个不同格式的二进制包文件：
+
+  ```sh
+  root@dong:/home/dong/Cmake-Tutorial/Demo_pack/build# ll DemoPack-0.1.1-Linux.
+  DemoPack-0.1.1-Linux.sh      DemoPack-0.1.1-Linux.tar.Z
+  DemoPack-0.1.1-Linux.tar.gz 
+  ```
+
+  这 3 个二进制包文件所包含的内容是完全相同的。我们可以执行其中一个。此时会出现一个由 CPack 自动生成的交互式安装界面:
+
+  ```sh
+  root@dong:/home/dong/Cmake-Tutorial/Demo_pack/build# sh DemoPack-0.1.1-Linux.sh 
+  DemoPack Installer Version: 0.1.1, Copyright (c) Humanity
+  This is a self-extracting archive.
+  The archive will be extracted to: /home/dong/Cmake-Tutorial/Demo_pack/build
+  
+  If you want to stop extracting, please press <ctrl-C>.
+  It is a test how to genarate a pack
+  The MIT License (MIT)
+  
+  Copyright (c) 2021 wodingdong
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy of
+  this software and associated documentation files (the "Software"), to deal in
+  the Software without restriction, including without limitation the rights to
+  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies o
+  f
+  the Software, and to permit persons to whom the Software is furnished to do so,
+  subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNES
+  S
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
+  
+  Do you accept the license? [yN]: 
+  y
+  By default the DemoPack will be installed in:
+    "/home/dong/Cmake-Tutorial/Demo_pack/build/DemoPack-0.1.1-Linux"
+  Do you want to include the subdirectory DemoPack-0.1.1-Linux?
+  Saying no will install in: "/home/dong/Cmake-Tutorial/Demo_pack/build" [Yn]: 
+  y
+  
+  Using target directory: /home/dong/Cmake-Tutorial/Demo_pack/build/DemoPack-0.1.1-Linux
+  Extracting, please wait...
+  
+  Unpacking finished successfully
+  ```
+
+  安装到目录后，执行：
+
+  ```
+  root@dong:/home/dong/Cmake-Tutorial/Demo_pack/build# ./DemoPack-0.1.1-Linux/bin/demo 
+  
+  it is my add function!
+  
+   it is my sub function!
+  my sum is :3
+  
+  my sub is :7
+  ```
+
+  
 
 ### 相关链接
 
