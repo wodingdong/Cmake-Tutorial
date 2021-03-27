@@ -731,6 +731,58 @@ include (CPack)
   my sub is :7
   ```
 
+  ### 最后
+
+  可以执行`auto_compile_run.sh`和`auto_clean.py`去一键生成Demo1-8的程序:
+
+  ```
+  root@dong:/home/dong/Cmake-Tutorial# sh auto_compile_run.sh 
+  ************ + Demo1 + result**********
+  
+  it is my add function!
+  my sum is :3
+  
+  ************ + Demo2 + result**********
+  
+  it is my add function!
+  my sum is :3
+  
+  ************ + Demo3 + result**********
+  
+  it is my add function!
+  my sum is :3
+  
+  -- Configuring done
+  -- Generating done
+  -- Build files have been written to: /home/dong/Cmake-Tutorial/Demo4/build
+  [100%] Built target myaddfun
+  ************ + Demo4 + result**********
+  -- Configuring done
+  -- Generating done
+  -- Build files have been written to: /home/dong/Cmake-Tutorial/Demo5/build
+  [100%] Built target myaddfun
+  ************ + Demo5 + result**********
+  ************ + Demo6 + result**********
+  
+  it is my add function!
+  my sum is :3
+  
+  ************ + Demo7 + result**********
+  
+  it is my add function!
+  my sum is :3
+  
+  ************ + Demo8 + result**********
+  
+  it is my add function!
+  
+   it is my sub function!
+  my sum is :3
+  
+  my sub is :7
+  
+  ```
+
   
 
 ### 相关链接
