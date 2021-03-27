@@ -106,8 +106,11 @@ my sum is :3
 
 .
 ├── add.c
+
 ├── add.h
+
 ├── CMakeLists.txt
+
 └── main.c
 
  这时，对应的CMakeLists.txt是：
@@ -147,6 +150,43 @@ add_executable(demo ${DIR_SRCS})
 ### Demo3 多个目录和文件
 
 > 对应源代码目录： [Demo3](https://github.com/wodingdong/Cmake-Tutorial/tree/main/Demo3)
+
+项目结构是：
+
+.
+├── add
+
+│   ├── add.c
+
+│   └── add.h
+
+├── CMakeLists.txt
+
+└── main.c
+
+需要将add目录下的源文件也要包含进来，这时CMakeLists.txt是：
+
+```cmake
+# cmake最低版本要求
+cmake_minimum_required (VERSION 3.10)
+
+# 项目名称
+project (Demo3)
+
+# 添加源文件
+aux_source_directory(. DIR_SRCS)
+# 将add目录下的源文件也包含进来
+aux_source_directory(add DIR_SRCS)
+
+# 头文件要包含的目录
+include_directories(add)
+
+# 指定生成目标
+add_executable(demo ${DIR_SRCS})
+
+```
+
+
 
 ### Demo4 静态库
 
