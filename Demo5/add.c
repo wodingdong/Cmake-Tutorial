@@ -3,7 +3,7 @@
 
 int add(int a, int b)
 {
-	printf("\nit is my function!\n");
+	printf("\nit is my add function!\n");
 	return a+b;
 }
 
