@@ -207,7 +207,7 @@ add_library(myaddfun STATIC ${DIR_LIB_SRCS})
 
 ```
 
-编译生成libaddfun.a文件
+编译生成libmyaddfun.a文件
 
 ```sh
 root@dong:/home/dong/Cmake-Tutorial/Demo4# mkdir build
